@@ -5,9 +5,38 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculator</title>
+    <link rel="stylesheet" href="styles/main.css">
     <script src="static/functionality.js" defer></script>
 </head>
 <body>
-    <h1>Go to the console!</h1>
+    <main>
+        <div id="flex-container">
+            <div id='calc-container'>
+                <div id="display">
+                    <p id="lastOperation"></p>
+                    <p id="currentOperation"></p>
+                </div>
+                <button type="button" class="special-btn" id="ac">AC</button>
+                <button type="button" class="special-btn" data-key="Backspace" id="del">DEL</button>
+                <button type="button" class="special-btn" data-key="/">&divide;</button>
+                <button type="button" class="special-btn" data-key="x">x</button>
+                <button type="button" data-key="7">7</button>
+                <button type="button" data-key="8">8</button>
+                <button type="button" data-key="9">9</button>
+                <button type="button" class="special-btn" data-key="-">-</button>
+                <button type="button" data-key="4">4</button>
+                <button type="button" data-key="5">5</button>
+                <button type="button" data-key="6">6</button>
+                <button type="button" class="special-btn" data-key="+">+</button>
+                <button type="button" data-key="1">1</button>
+                <button type="button" data-key="2">2</button>
+                <button type="button" data-key="3">3</button>
+                <button type="button" data-key="0">0</button>
+                <button type="button" data-key="0">0</button>
+                <button type="button" data-key="0">0</button>
+                <button type="button" class="special-btn equal-btn" data-key="=">=</button>
+            </div>
+        </div>
+    </main>
 </body>
 </html>
