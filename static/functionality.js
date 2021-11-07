@@ -1,3 +1,4 @@
+// Calculator functions.
 function add(a, b) {
     return a + b;
 }
@@ -15,7 +16,6 @@ function divide(a, b) {
 }
 
 function operate(operator, a, b) {
-    // FUnction to know which operand the user is using and then calling the appropiate function to return the result.
     switch (operator) {
         case '+':
             return add(a, b);
@@ -31,8 +31,3 @@ function operate(operator, a, b) {
             break;
     }
 }
-
-console.log(operate('+', 33, 17));
-console.log(operate('-', 33, 17));
-console.log(operate('*', 33, 17));
-console.log(operate('/', 33, 17));
