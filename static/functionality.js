@@ -12,6 +12,7 @@ let operator;
 
 AC.addEventListener('click', restartCalculator);
 DEL.addEventListener('click', deleteOneChar);
+ENTER.addEventListener('click', displayResult);
 
 for (let button of NUMBERS) {
     button.addEventListener('click', displayNumber);
@@ -21,6 +22,18 @@ for (let button of OPERATORS) {
     button.addEventListener('click', operatorBtn);
 }
 
+
+function displayResult() {
+    if (firstNum && operator) {
+        secondNum = actualOp.textContent;
+        lastOp.textContent = `${firstNum} ${operator} ${secondNum} =`;
+        actualOp.textContent = operate(operator, +firstNum, +secondNum);
+
+        operator = '';
+        firstNum = 0;
+        secondNum = 0;
+    }
+}
 
 function operatorBtn(e) {
     lastOp.textContent = `${actualOp.textContent} ${e.target.textContent}`;
@@ -82,15 +95,11 @@ function operate(operator, a, b) {
     switch (operator) {
         case '+':
             return add(a, b);
-            break;
         case '-':
             return subtract(a, b);
-            break;
         case '*':
             return multiply(a, b);
-            break;
         case '/':
             return divide(a, b);
-            break;
     }
 }
