@@ -14,14 +14,15 @@ let operator;
 AC.addEventListener('click', restartCalculator);
 DEL.addEventListener('click', deleteOneChar);
 ENTER.addEventListener('click', displayResult);
-PERCENTAGE.addEventListener('click', percentageBtn);
+PERCENTAGE.addEventListener('click', (e) => percentageBtn(e.target));
+window.addEventListener('keydown', keyboardSupport);
 
 for (let button of NUMBERS) {
-    button.addEventListener('click', displayNumber);
+    button.addEventListener('click', (e) => displayNumber(e.target));
 }
 
 for (let button of OPERATORS) {
-    button.addEventListener('click', operatorBtn);
+    button.addEventListener('click', (e) => operatorBtn(e.target));
 }
 
 
@@ -38,19 +39,20 @@ function displayResult() {
 }
 
 function operatorBtn(e) {
+    console.log(e);
     if (firstNum && operator) {
         secondNum = actualOp.textContent;
         if (+secondNum) {
             firstNum = operate(operator, +firstNum, +secondNum);
         }
 
-        operator = e.target.textContent;
-        lastOp.textContent = `${firstNum} ${e.target.textContent}`;
+        operator = e.textContent;
+        lastOp.textContent = `${firstNum} ${e.textContent}`;
         secondNum = 0;
     } else {
-        lastOp.textContent = `${actualOp.textContent} ${e.target.textContent}`;
+        lastOp.textContent = `${actualOp.textContent} ${e.textContent}`;
         firstNum = actualOp.textContent;
-        operator = e.target.textContent;
+        operator = e.textContent;
     }
     actualOp.textContent = '0';
 }
@@ -67,7 +69,7 @@ function percentageBtn(e) {
 
         firstNum = '';
     } else {
-        lastOp.textContent = `${actualOp.textContent}${e.target.textContent}`;
+        lastOp.textContent = `${actualOp.textContent}${e.textContent}`;
         secondNum = percentage(+secondNum);
         actualOp.textContent = secondNum;
     }
@@ -75,8 +77,8 @@ function percentageBtn(e) {
 }
 
 function displayNumber(e) {
-    (actualOp.textContent === '0') ? actualOp.textContent = e.target.textContent :
-        actualOp.textContent += `${e.target.textContent}`; 
+    (actualOp.textContent === '0') ? actualOp.textContent = e.textContent :
+        actualOp.textContent += `${e.textContent}`; 
 }
 
 function restartCalculator() {
@@ -92,7 +94,22 @@ function deleteOneChar() {
     actualOp.textContent = actualOp.textContent.slice(0, actualOp.textContent.length - 1);
 }
 
-
+function keyboardSupport(e) {
+    const button = document.querySelector(`button[data-key=\"${e.key}\"]`);
+    if (button.classList.contains('number')) {
+        displayNumber(button);
+    } else if (button.classList.contains('operator')) {
+        operatorBtn(button);
+    } else if (button.dataset.key === 'Backspace') {
+        deleteOneChar();
+    } else if (button.dataset.key === '%') {
+        percentageBtn(button);
+    } else if (button.dataset.key === 'Enter') {
+        displayResult();
+    } else if (button.dataset.key === 'Escape') {
+        restartCalculator();
+    }
+}
 
 
 
