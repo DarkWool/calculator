@@ -3,6 +3,7 @@ const OPERATORS = document.body.getElementsByClassName('operator');
 const AC = document.getElementById('ac');
 const DEL = document.getElementById('del');
 const ENTER = document.getElementById('enter-btn');
+const PERCENTAGE = document.getElementById('percentage');
 const lastOp = document.getElementById('lastOperation');
 const actualOp = document.getElementById('currentOperation');
 
@@ -13,6 +14,7 @@ let operator;
 AC.addEventListener('click', restartCalculator);
 DEL.addEventListener('click', deleteOneChar);
 ENTER.addEventListener('click', displayResult);
+PERCENTAGE.addEventListener('click', percentageBtn);
 
 for (let button of NUMBERS) {
     button.addEventListener('click', displayNumber);
@@ -36,19 +38,40 @@ function displayResult() {
 }
 
 function operatorBtn(e) {
-    lastOp.textContent = `${actualOp.textContent} ${e.target.textContent}`;
-    
-    if (firstNum) {
+    if (firstNum && operator) {
         secondNum = actualOp.textContent;
-        firstNum = operate(operator, +firstNum, +secondNum);
+        if (+secondNum) {
+            firstNum = operate(operator, +firstNum, +secondNum);
+        }
 
-        operator = e.target.dataset.key;
-        lastOp.textContent = `${firstNum} ${operator}`;
+        operator = e.target.textContent;
+        lastOp.textContent = `${firstNum} ${e.target.textContent}`;
+        secondNum = 0;
     } else {
+        lastOp.textContent = `${actualOp.textContent} ${e.target.textContent}`;
         firstNum = actualOp.textContent;
-        operator = e.target.dataset.key;
+        operator = e.target.textContent;
     }
     actualOp.textContent = '0';
+}
+
+function percentageBtn(e) {
+    secondNum = actualOp.textContent;
+
+    // If there is an expression behind the actual calculation...
+    if (firstNum) {
+        lastOp.textContent = `${firstNum} ${operator} ${secondNum}% =`;
+        secondNum = percentage(+firstNum, +secondNum);
+        secondNum = operate(operator, +firstNum, +secondNum);
+        actualOp.textContent = `${secondNum}`;
+
+        firstNum = '';
+    } else {
+        lastOp.textContent = `${actualOp.textContent}${e.target.textContent}`;
+        secondNum = percentage(+secondNum);
+        actualOp.textContent = secondNum;
+    }
+    operator = '';
 }
 
 function displayNumber(e) {
@@ -91,15 +114,23 @@ function divide(a, b) {
     return a / b;
 }
 
+function percentage(a, b) {
+    if (b) {
+        b /= 100;
+        return a * b;
+    }
+    return a / 100;
+}
+
 function operate(operator, a, b) {
     switch (operator) {
         case '+':
             return add(a, b);
         case '-':
             return subtract(a, b);
-        case '*':
+        case 'x':
             return multiply(a, b);
-        case '/':
+        case '÷':
             return divide(a, b);
     }
 }
