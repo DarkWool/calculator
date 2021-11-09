@@ -10,6 +10,7 @@ const actualOp = document.getElementById('currentOperation');
 let firstNum;
 let secondNum;
 let operator;
+let dotAvailable = true;
 
 AC.addEventListener('click', restartCalculator);
 DEL.addEventListener('click', deleteOneChar);
@@ -39,8 +40,11 @@ function displayResult() {
 }
 
 function operatorBtn(e) {
-    console.log(e);
-    if (firstNum && operator) {
+    if (e.dataset.key === '.') {
+        checkForDot();
+        if (dotAvailable) actualOp.textContent += '.';
+        return;
+    } else if (firstNum && operator) {
         secondNum = actualOp.textContent;
         if (+secondNum) {
             firstNum = operate(operator, +firstNum, +secondNum);
@@ -78,13 +82,14 @@ function percentageBtn(e) {
 
 function displayNumber(e) {
     (actualOp.textContent === '0') ? actualOp.textContent = e.textContent :
-        actualOp.textContent += `${e.textContent}`; 
+        actualOp.textContent += `${e.textContent}`;
 }
 
 function restartCalculator() {
     firstNum = 0;
     secondNum = 0;
     operator = '';
+    dotAvailable = true;
 
     lastOp.textContent = '';
     actualOp.textContent = '0';
@@ -94,8 +99,13 @@ function deleteOneChar() {
     actualOp.textContent = actualOp.textContent.slice(0, actualOp.textContent.length - 1);
 }
 
+function checkForDot() {
+    dotAvailable = (actualOp.textContent.match(/\.{1}/)) ? false : true;
+}
+
 function keyboardSupport(e) {
     const button = document.querySelector(`button[data-key=\"${e.key}\"]`);
+
     if (button.classList.contains('number')) {
         displayNumber(button);
     } else if (button.classList.contains('operator')) {
