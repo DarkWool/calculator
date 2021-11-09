@@ -49,7 +49,7 @@ function operatorBtn(e) {
         if (+secondNum) {
             firstNum = operate(operator, +firstNum, +secondNum);
         }
-
+        
         operator = e.textContent;
         lastOp.textContent = `${firstNum} ${e.textContent}`;
         secondNum = 0;
@@ -106,21 +106,23 @@ function checkForDot() {
 function keyboardSupport(e) {
     const button = document.querySelector(`button[data-key=\"${e.key}\"]`);
 
-    if (button.classList.contains('number')) {
-        displayNumber(button);
-    } else if (button.classList.contains('operator')) {
-        operatorBtn(button);
-    } else if (button.dataset.key === 'Backspace') {
-        deleteOneChar();
-    } else if (button.dataset.key === '%') {
-        percentageBtn(button);
-    } else if (button.dataset.key === 'Enter') {
-        displayResult();
-    } else if (button.dataset.key === 'Escape') {
-        restartCalculator();
+    if (button) {
+        if (button.classList.contains('number')) {
+            return displayNumber(button);
+        } else if (button.classList.contains('operator')) {
+            return operatorBtn(button);
+        } else if (button.dataset.key === 'Backspace') {
+            return deleteOneChar();
+        } else if (button.dataset.key === '%') {
+            return percentageBtn(button);
+        } else if (button.dataset.key === 'Enter') {
+            e.preventDefault();
+            return displayResult();
+        } else if (button.dataset.key === 'Escape') {
+            return restartCalculator();
+        }
     }
 }
-
 
 
 
