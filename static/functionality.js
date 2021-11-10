@@ -11,10 +11,11 @@ let firstNum;
 let secondNum;
 let operator;
 let dotAvailable = true;
+let firstDigit = true;
 
 AC.addEventListener('click', restartCalculator);
 DEL.addEventListener('click', deleteOneChar);
-ENTER.addEventListener('click', displayResult);
+ENTER.addEventListener('click', enterBtn);
 PERCENTAGE.addEventListener('click', (e) => percentageBtn(e.target));
 window.addEventListener('keydown', keyboardSupport);
 
@@ -27,62 +28,77 @@ for (let button of OPERATORS) {
 }
 
 
-function displayResult() {
+function enterBtn() {
+    if (checkMathError()) return;
+
     if (firstNum && operator) {
         secondNum = actualOp.textContent;
         lastOp.textContent = `${firstNum} ${operator} ${secondNum} =`;
-        actualOp.textContent = operate(operator, +firstNum, +secondNum);
+        firstNum = operate(operator, +firstNum, +secondNum);
+        actualOp.textContent = firstNum;
 
         operator = '';
-        firstNum = 0;
         secondNum = 0;
+        firstDigit = true;
     }
 }
 
 function operatorBtn(e) {
+    if (checkMathError()) return;
+
     if (e.dataset.key === '.') {
         checkForDot();
         if (dotAvailable) actualOp.textContent += '.';
         return;
     } else if (firstNum && operator) {
         secondNum = actualOp.textContent;
-        if (+secondNum) {
+        if (!firstDigit) {
             firstNum = operate(operator, +firstNum, +secondNum);
         }
         
         operator = e.textContent;
-        lastOp.textContent = `${firstNum} ${e.textContent}`;
+        (firstNum === 'Math Error') ? lastOp.textContent = '' :
+            lastOp.textContent = `${firstNum} ${operator}`;
         secondNum = 0;
     } else {
         lastOp.textContent = `${actualOp.textContent} ${e.textContent}`;
         firstNum = actualOp.textContent;
         operator = e.textContent;
     }
-    actualOp.textContent = '0';
+    actualOp.textContent = firstNum;
+    firstDigit = true;
 }
 
 function percentageBtn(e) {
-    secondNum = actualOp.textContent;
+    if (checkMathError()) return;
 
     // If there is an expression behind the actual calculation...
-    if (firstNum) {
+    if (firstNum && operator) {
+        secondNum = actualOp.textContent;
         lastOp.textContent = `${firstNum} ${operator} ${secondNum}% =`;
-        secondNum = percentage(+firstNum, +secondNum);
-        secondNum = operate(operator, +firstNum, +secondNum);
-        actualOp.textContent = `${secondNum}`;
 
-        firstNum = '';
+        secondNum = percentage(+firstNum, +secondNum);
+        firstNum = operate(operator, +firstNum, +secondNum);
+
+        actualOp.textContent = `${firstNum}`;
     } else {
         lastOp.textContent = `${actualOp.textContent}${e.textContent}`;
-        secondNum = percentage(+secondNum);
-        actualOp.textContent = secondNum;
+        firstNum = percentage(+actualOp.textContent);
+        actualOp.textContent = firstNum;
     }
+
     operator = '';
+    firstDigit = true;
 }
 
 function displayNumber(e) {
-    (actualOp.textContent === '0') ? actualOp.textContent = e.textContent :
+    if (firstDigit) {
+        checkMathError();
+        actualOp.textContent = e.textContent;
+        firstDigit = false;
+    } else {
         actualOp.textContent += `${e.textContent}`;
+    }
 }
 
 function restartCalculator() {
@@ -90,12 +106,14 @@ function restartCalculator() {
     secondNum = 0;
     operator = '';
     dotAvailable = true;
+    firstDigit = true;
 
     lastOp.textContent = '';
     actualOp.textContent = '0';
 }
 
 function deleteOneChar() {
+    if (checkMathError()) return;
     actualOp.textContent = actualOp.textContent.slice(0, actualOp.textContent.length - 1);
 }
 
@@ -117,13 +135,21 @@ function keyboardSupport(e) {
             return percentageBtn(button);
         } else if (button.dataset.key === 'Enter') {
             e.preventDefault();
-            return displayResult();
+            return enterBtn();
         } else if (button.dataset.key === 'Escape') {
             return restartCalculator();
         }
     }
 }
 
+function checkMathError() {
+    if (firstNum === 'Math Error' || secondNum === 'Math Error') {
+        restartCalculator();
+        firstDigit = true;
+        return true;
+    }
+    return false;
+}
 
 
 // Calculator functions.
@@ -140,14 +166,12 @@ function multiply(a, b) {
 }
 
 function divide(a, b) {
+    if (b === 0) return 'Math Error';
     return a / b;
 }
 
 function percentage(a, b) {
-    if (b) {
-        b /= 100;
-        return a * b;
-    }
+    if (b || b === 0) return a * (b / 100);
     return a / 100;
 }
 
