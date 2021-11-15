@@ -4,12 +4,12 @@ const OPERATORS = document.body.getElementsByClassName('operator');
 const ac = document.getElementById('ac');
 const del = document.getElementById('del');
 const enter = document.getElementById('enter-btn');
-const percentageBtn = document.getElementById('percentage');
-const lastOp = document.getElementById('lastOperation');
-const actualOp = document.getElementById('currentOperation');
+const dotOperator = document.getElementById('dot');
+const lastOperation = document.getElementById('lastOperation');
+const currOperation = document.getElementById('currentOperation');
 
-let firstNum;
-let secondNum;
+let firstOperand;
+let secondOperand;
 let operator;
 let dotAvailable = true;
 let firstDigit = true;
@@ -17,8 +17,8 @@ let newOperation = false;
 
 ac.addEventListener('click', restartCalculator);
 del.addEventListener('click', deleteOneChar);
-enter.addEventListener('click', getResult);
-percentageBtn.addEventListener('click', (e) => getPercentage(e.target));
+enter.addEventListener('click', (e) => getResult(e.target));
+dotOperator.addEventListener('click', dot);
 window.addEventListener('keydown', keyboardSupport);
 
 for (let button of NUMBERS) {
@@ -26,142 +26,121 @@ for (let button of NUMBERS) {
 }
 
 for (let button of OPERATORS) {
-    button.addEventListener('click', (e) => operatorBtn(e.target));
+    button.addEventListener('click', (e) => displayOperator(e.target));
 }
 
-
-function getResult() {
+function displayOperator(e) {
     if (checkMathError()) return;
 
-    if (firstNum && operator) {
-        secondNum = actualOp.textContent;
-        lastOp.textContent = `${firstNum} ${operator} ${secondNum} =`;
-        firstNum = operate(operator, +firstNum, +secondNum);
-        actualOp.textContent = firstNum;
-        trimDecimals(actualOp.textContent);
+    getResult(e);
 
-        operator = '';
-        secondNum = 0;
-        firstDigit = true;
-        newOperation = true;
-    }
-}
+    if (e.dataset.key === '%') return;
 
-function operatorBtn(e) {
-    if (checkMathError()) return;
+    newOperation = false;
+    operator = e.textContent;
 
-    if (e.dataset.key === '.') {
-        checkForDot();
-        if (newOperation) return showAnswer();
-        else if (dotAvailable) {
-            actualOp.textContent += '.';
-            firstDigit = false;
-        }
+    if (firstOperand === 'Math Error') {
+        lastOperation.textContent = '';
+        currOperation.textContent = `${firstOperand}`;
         return;
     }
-    
-    (newOperation) ? newOperation = false : false;
+    lastOperation.textContent = `${firstOperand} ${operator}`;
+    currOperation.textContent = '0';
+}
 
-    if (firstNum && operator) {
-        secondNum = actualOp.textContent;
-        if (!firstDigit) {
-            firstNum = operate(operator, +firstNum, +secondNum);
+function getResult(e) {
+    if (firstOperand && operator) {
+        secondOperand = currOperation.textContent;
+
+        if (e.dataset.key === '%') getPercentage('two');
+        else lastOperation.textContent = `${firstOperand} ${operator} ${secondOperand} =`;
+
+        firstOperand = operate(operator, +firstOperand, +secondOperand);
+
+        if (e.dataset.key === 'Enter' || e.dataset.key === '%') {
+            operator = undefined;
+            newOperation = true;
+            currOperation.textContent = trimDecimals(String(firstOperand));
         }
-        
-        operator = e.textContent;
-        (firstNum === 'Math Error') ? lastOp.textContent = '' :
-            lastOp.textContent = `${firstNum} ${operator}`;
-        secondNum = 0;
     } else {
-        firstNum = actualOp.textContent;
-        operator = e.textContent;
-        lastOp.textContent = `${firstNum} ${operator}`;
+        (e.dataset.key === '%') ? getPercentage('one') : false;
+        if (!firstOperand) firstOperand = currOperation.textContent;
     }
-    actualOp.textContent = '0';
-    trimDecimals(actualOp.textContent);
+
     firstDigit = true;
 }
 
-function getPercentage(e) {
-    (newOperation) ? newOperation = false : false;
-    if (checkMathError()) return;
-
-    // If there is an expression behind the actual calculation...
-    if (firstNum && operator) {
-        secondNum = actualOp.textContent;
-        lastOp.textContent = `${firstNum} ${operator} ${secondNum}% =`;
-
-        if (operator === '+' || operator === '-') {
-            secondNum = percentage(+firstNum, +secondNum);
-            firstNum = operate(operator, +firstNum, +secondNum);
-        } else {
-            secondNum = percentage(+secondNum);
-            firstNum = operate(operator, +firstNum, +secondNum);
-        }
-        newOperation = true;
+function getPercentage(operandsQuantity) {
+    if (operandsQuantity === 'two') {
+        lastOperation.textContent = `${firstOperand} ${operator} ${secondOperand}% =`;
+        (operator === '+' || operator === '-') ?
+            secondOperand = percentage(+firstOperand, +secondOperand) :
+            secondOperand = percentage(+secondOperand);
     } else {
-        lastOp.textContent = `${actualOp.textContent}${e.textContent}`;
-        firstNum = percentage(+actualOp.textContent);
-        newOperation = true;
+        firstOperand = percentage(+currOperation.textContent);
+        lastOperation.textContent = `${currOperation.textContent}% =`;
+        currOperation.textContent = trimDecimals(String(firstOperand));
     }
-    
-    actualOp.textContent = firstNum;
-    trimDecimals(actualOp.textContent);
-    operator = '';
-    firstDigit = true;
+
+    newOperation = true;
+}
+
+function dot() {
+    if (newOperation) showAnswer();
+
+    dotAvailable = (currOperation.textContent.match(/\.{1}/)) ? false : true;
+    if (dotAvailable) {
+        currOperation.textContent += '.';
+        firstDigit = false;
+    }
+    return;
 }
 
 function trimDecimals(str) {
-    (str.length > 13) ? actualOp.textContent = firstNum.toPrecision(8) : false;
+    return (str.length > 12) ? Number(str).toPrecision(8) : str;
 }
 
 function displayNumber(e) {
     if (firstDigit) {
         if (newOperation) showAnswer();
         checkMathError();
-        actualOp.textContent = e.textContent;
+        currOperation.textContent = e.textContent;
         firstDigit = false;
     } else {
-        actualOp.textContent += `${e.textContent}`;
+        currOperation.textContent += `${e.textContent}`;
     }
 }
 
 function restartCalculator() {
-    firstNum = 0;
-    secondNum = 0;
+    firstOperand = 0;
+    secondOperand = 0;
     operator = '';
     dotAvailable = true;
     firstDigit = true;
     newOperation = false;
 
-    lastOp.textContent = '';
-    actualOp.textContent = '0';
+    lastOperation.textContent = '';
+    currOperation.textContent = '0';
 }
 
-function deleteOneChar(e) {
-    if (newOperation) showAnswer();
+function deleteOneChar() {
+    if (newOperation) return showAnswer();
 
     if (firstDigit) {
         checkMathError();
-        actualOp.textContent = '0';
-        // firstDigit = false;
+        currOperation.textContent = '0';
         return;
     }
-    actualOp.textContent = actualOp.textContent.slice(0, actualOp.textContent.length - 1);
+    currOperation.textContent = currOperation.textContent.slice(0, currOperation.textContent.length - 1);
 }
 
 function showAnswer() {
-    if (actualOp.textContent !== 'Math Error' && actualOp.textContent !== NaN) {
-        lastOp.textContent = `Ans = ${actualOp.textContent}`;
-
-        actualOp.textContent = '0';
-        firstNum = undefined;
+    if (!checkMathError()) {
+        lastOperation.textContent = `Ans = ${currOperation.textContent}`;
+        currOperation.textContent = '0';
+        firstOperand = undefined;
         newOperation = false;
     }
-}
-
-function checkForDot() {
-    dotAvailable = (actualOp.textContent.match(/\.{1}/)) ? false : true;
 }
 
 function keyboardSupport(e) {
@@ -171,14 +150,14 @@ function keyboardSupport(e) {
         if (button.classList.contains('number')) {
             return displayNumber(button);
         } else if (button.classList.contains('operator')) {
-            return operatorBtn(button);
+            return displayOperator(button);
         } else if (button.dataset.key === 'Backspace') {
             return deleteOneChar();
-        } else if (button.dataset.key === '%') {
-            return getPercentage(button);
+        } else if (button.dataset.key === '.') {
+            return dot();
         } else if (button.dataset.key === 'Enter') {
             e.preventDefault();
-            return getResult();
+            return getResult(button);
         } else if (button.dataset.key === 'Escape') {
             return restartCalculator();
         }
@@ -186,7 +165,7 @@ function keyboardSupport(e) {
 }
 
 function checkMathError() {
-    if (firstNum === 'Math Error' || secondNum === 'Math Error') {
+    if (firstOperand === 'Math Error' || secondOperand === 'Math Error') {
         restartCalculator();
         firstDigit = true;
         return true;
@@ -194,8 +173,6 @@ function checkMathError() {
     return false;
 }
 
-
-// Calculator functions.
 function add(a, b) {
     return a + b;
 }
@@ -213,10 +190,9 @@ function divide(a, b) {
     return a / b;
 }
 
-function percentage(a, b) {
+function percentage(a, b = 1) {
     if (a === 0) return 0;
-    if (b || b === 0) return a * (b / 100);
-    return a / 100;
+    else if (b || b === 0) return a * (b / 100);
 }
 
 function operate(operator, a, b) {
