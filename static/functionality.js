@@ -207,3 +207,15 @@ function operate(operator, a, b) {
             return divide(a, b);
     }
 }
+
+
+// Display the calculator full screen on mobile (avoiding the browser interface)
+let vh = window.innerHeight * 0.01;
+document.getElementById('flex-container').style.setProperty('--vh', `${vh}px`);
+
+window.addEventListener('resize', resizeScreen);
+
+function resizeScreen() {
+    vh = window.innerHeight * 0.01;
+    document.getElementById('flex-container').style.setProperty('--vh', `${vh}px`);
+}

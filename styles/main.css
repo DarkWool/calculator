@@ -38,9 +38,13 @@ body {
         0px 2.3px 14.1px rgba(0, 0, 0, 0.104),
         0px 7.8px 20.3px rgba(0, 0, 0, 0.122),
         0px 35px 33px rgba(0, 0, 0, 0.14);
-    padding: .5rem;
+    padding: .6rem;
     border-radius: .5rem;
     color: var(--textColor);
+}
+
+#currentOperation {
+    font-size: 2.5rem;
 }
 
 #display {
@@ -67,12 +71,7 @@ button:active {
 #lastOperation {
     min-height: 40px;
     font-weight: 500;
-    color: #959595;
-    margin-bottom: .5rem;
-}
-
-#currentOperation {
-    font-size: 2.5rem;
+    color: #a59d92;
 }
 
 #enter-btn {
@@ -92,15 +91,25 @@ button:active {
 }
 
 /* ----- Media Queries ----- */
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 767px) {
     * {
         font-size: 1.3rem;
+    }
+
+	body {
+        background-color: #181a1b;
+    }
+    
+    #flex-container {
+    	height: 100vh; /* Fallback */
+    	height: calc(var(--vh, 1vh) * 100);
     }
 
     #calc-container {
         box-shadow: none;
         border-radius: 0;
-        height: 100vh;
+        height: 100%;
+        max-width: 100%;
         grid-template-rows: repeat(6, 1fr);
         padding: .7rem;
         gap: .25rem;
@@ -116,6 +125,52 @@ button:active {
 
     #currentOperation {
         font-size: 2.3rem;
+    }
+}
+
+@media only screen and (min-width: 992px) {
+    * {
+        font-size: 1.15rem;
+    }
+
+    #calc-container {
+        grid-template-rows: minmax(120px, auto);
+        grid-auto-rows: minmax(90px, auto);
+        max-width: 400px;
+        padding: 0.3rem;
+    }
+
+    #lastOperation {
+        margin-bottom: 0;
+    }
+
+    #currentOperation {
+        font-size: 2.2rem;
+    }
+
+    #enter-btn {
+        margin: 0.3rem;
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    * {
+        font-size: 1.3rem;
+    }
+
+    #calc-container {
+        grid-template-rows: minmax(140px, auto);
+        grid-auto-rows: minmax(120px, auto);
+        max-width: 450px;
+        padding: 0.6rem;
+    }
+
+    #currentOperation {
+        font-size: 2.5rem;
+    }
+
+    #enter-btn {
+        margin: 0rem;
     }
 }
 
